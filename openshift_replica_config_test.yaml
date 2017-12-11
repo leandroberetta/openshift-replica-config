@@ -1,0 +1,16 @@
+clusters:
+  - name: cluster1
+    url: https://cluster1.com:8443
+  - name: cluster2
+    url: https://cluster2.com:8443
+applications:
+  - name: app1
+    replicas:
+      - cluster: cluster1
+        pods: 3
+  - name: app2
+    replicas:
+      - cluster: cluster1
+        pods: 1
+      - cluster: cluster2
+        pods: 1
