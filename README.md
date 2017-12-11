@@ -20,7 +20,7 @@ For the cluster 'cluster1':
 
     export TOKEN_CLUSTER1={TOKEN}
 
-## Config file
+### Configuration File
 
     clusters:
       - name: cluster1
