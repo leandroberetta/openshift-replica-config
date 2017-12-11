@@ -69,12 +69,10 @@ def gather_commands_by_failover_cluster(commands_by_cluster, failover_cluster):
 
 def execute_command(command):
     logging.info('executing command "{}"'.format(command))
-    try:
-        output = subprocess.check_output(command.split(' '))
 
-        logging.info('command output is "{}"'.format(output))
-    except subprocess.CalledProcessError as e:
-        logging.error('command "{}" failed with error {}'.format(command, e))
+    output = subprocess.check_output(command.split(' '), stderr=subprocess.STDOUT)
+
+    logging.info('command output is "{}"'.format(output))
 
 
 def get_token_for_cluster(cluster):
@@ -114,7 +112,9 @@ def execute_commands_by_clusters(commands_by_cluster, clusters):
 
             for command in commands:
                 execute_command(command)
-    except Exception:
+    except subprocess.CalledProcessError as e:
+        logging.error('command failed with error {}'.format(e.output))
+
         print('error: see the log file')
 
 
