@@ -24,7 +24,7 @@ class FailoverTest(unittest.TestCase):
 
         self.assertIn('oc scale --replicas=3 dc app1 -n prod', commands_by_cluster['cluster1'])
         self.assertIn('oc scale --replicas=1 dc app2 -n prod', commands_by_cluster['cluster1'])
-        self.assertIn('oc scale --replicas=1 dc app2 -n prod', commands_by_cluster['cluster2'])
+        self.assertIn('oc scale --replicas=1 dc app2 -n dev', commands_by_cluster['cluster2'])
 
     def test_execute_command_error(self):
         wrong_command = openshift_replica_config.get_login_command('', '')

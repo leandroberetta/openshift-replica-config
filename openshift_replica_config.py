@@ -38,7 +38,7 @@ def get_input_parameters_if_valid():
 
 
 def gather_commands_by_cluster(applications, clusters):
-    SCALE_COMMAND = 'oc scale --replicas={} dc {} -n prod'
+    SCALE_COMMAND = 'oc scale --replicas={} dc {} -n {}'
     commands_by_cluster = {}
 
     for cluster in clusters:
@@ -50,7 +50,7 @@ def gather_commands_by_cluster(applications, clusters):
 
         for replica in application['replicas']:
             try:
-                command = SCALE_COMMAND.format(replica['pods'], application['name'])
+                command = SCALE_COMMAND.format(replica['pods'], application['name'], replica['project'])
 
                 logging.info('command: "{}" for cluster {}'.format(command, replica['cluster']))
 

@@ -31,10 +31,13 @@ For the cluster 'cluster1':
       - name: app1
         replicas:
           - cluster: cluster1
+            project: prod
             pods: 3
       - name: app2
         replicas:
           - cluster: cluster1
+            project: prod
             pods: 1
           - cluster: cluster2
+            project: uat
             pods: 1
