@@ -1,4 +1,9 @@
+*.pyc
+*.log
+
 .idea
 *.iml
-*.log
-*.pyc
+
+.coverage
+htmlcov
+__pycache__

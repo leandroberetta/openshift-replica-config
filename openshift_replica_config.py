@@ -7,34 +7,14 @@ import os
 import logging
 
 
-def config_logging():
-    logging.basicConfig(filename='openshift_replica_config.log', level=logging.INFO)
+def get_config_from_yaml(commands_file):
+    with open(commands_file) as f:
+        config = yaml.load(f)
 
+        clusters = config['clusters']
+        applications = config['applications']
 
-def get_config_from_yaml(config_file):
-    return yaml.load(open(config_file))
-
-
-def create_parser():
-    parser = argparse.ArgumentParser(description='')
-    parser.add_argument('config_file', metavar='config_file', type=str, help='configuration file')
-
-    return parser
-
-
-def get_input_parameters_if_valid():
-    parser = create_parser()
-
-    parameters = parser.parse_args()
-
-    if parameters.mode == 'restore':
-        return parameters.config_file, parameters.mode, None
-    elif parameters.mode == 'failover' and parameters.cluster is not None:
-        return parameters.config_file, parameters.mode, parameters.cluster
-    elif parameters.mode != 'restore' and parameters.mode != 'failover':
-        parser.error("mode is restore or failover.")
-    else:
-        parser.error("if mode is failover, --cluster is required.")
+        return clusters, applications
 
 
 def gather_commands_by_cluster(applications, clusters):
@@ -61,13 +41,7 @@ def gather_commands_by_cluster(applications, clusters):
     return commands_by_cluster
 
 
-def gather_commands_by_failover_cluster(commands_by_cluster, failover_cluster):
-    logging.info('keeping commands for cluster {}'.format(failover_cluster))
-
-    return {failover_cluster: commands_by_cluster[failover_cluster]}
-
-
-def execute_command(command):
+def execute_command(command):  # pragma: no cover
     logging.info('executing command "{}"'.format(command))
 
     output = subprocess.check_output(command.split(' '), stderr=subprocess.STDOUT)
@@ -115,27 +89,26 @@ def execute_commands_by_clusters(commands_by_cluster, clusters):
     except subprocess.CalledProcessError as e:
         logging.error('command failed with error {}'.format(e.output))
 
-        print('error: see the log file')
+        raise
 
 
 class TokenException(Exception):
     pass
 
 
-if __name__ == '__main__':
-    config_logging()
+if __name__ == '__main__':  # pragma: no cover
+    logging.basicConfig(filename='openshift_replica_config.log', level=logging.INFO)
 
     logging.info('failover process starting...')
-    parser = create_parser()
+
+    parser = argparse.ArgumentParser(description='')
+    parser.add_argument('config_file', metavar='config_file', type=str, help='configuration file')
     parameters = parser.parse_args()
 
     logging.info('getting configuration file from {}'.format(parameters.config_file))
 
     # Gets the YAML configuration
-    config = get_config_from_yaml(parameters.config_file)
-
-    clusters = config['clusters']
-    applications = config['applications']
+    clusters, applications = get_config_from_yaml(parameters.config_file)
 
     # Gathers commands by clusters
     commands_by_cluster = gather_commands_by_cluster(applications, clusters)
